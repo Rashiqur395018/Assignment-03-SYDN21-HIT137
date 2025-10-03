@@ -3,26 +3,21 @@ from utils import logged, timed
 from transformers import pipeline
 import threading
 
-# Base interface for models:
 class ModelInterface(ABC):
     @abstractmethod
     def predict(self, input_data):
-        """Run inference on input_data and return structured output."""
         raise NotImplementedError()
 
     @abstractmethod
     def get_info(self):
-        """Return a short description of the model and expected inputs."""
         raise NotImplementedError()
 
 class LoggingMixin:
     def log(self, message):
-        # Simple print-based logging; could be extended to write to a file
-        print(f"[{self._class.name_}] {message}")
+        print(f"[{self.__class__.__name__}] {message}")
 
-# Text sentiment model:
 class TextSentimentModel(ModelInterface, LoggingMixin):
-    def _init_(self, model_name="distilbert-base-uncased-finetuned-sst-2-english"):
+    def __init__(self, model_name="distilbert-base-uncased-finetuned-sst-2-english"):
         self._model_name = model_name
         self._pipeline = None
         self._lock = threading.Lock()
@@ -49,7 +44,7 @@ class TextSentimentModel(ModelInterface, LoggingMixin):
             "Input: a short text string.\n"
             "Output: list of label + score dicts from Hugging Face pipeline."
         )
-# Image classification model:
+
 class ImageClassificationModel(ModelInterface, LoggingMixin):
     def __init__(self, model_name="google/vit-base-patch16-224"):
         self._model_name = model_name
